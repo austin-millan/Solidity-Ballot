@@ -1,16 +1,14 @@
 /// @title Voting with delegation.
 contract Ballot {
-    // This declares a new complex type which will
-    // be used for variables later.
-    // It will represent a single voter.
+    // Represens a single voter
     struct Voter {
         uint weight; // weight is accumulated by delegation
         bool voted;  // if true, that person already voted
-        address delegate; // person delegated to
+        address delegate; // person delegated to (Holds a 20 byte value (size of an Ethereum address))
         uint vote;   // index of the voted proposal
     }
 
-    // This is a type for a single proposal.
+    // Define type for proposals
     struct Proposal
     {
         bytes32 name;   // short name (up to 32 bytes)
@@ -19,9 +17,9 @@ contract Ballot {
 
     address public chairperson;
 
-    // This declares a state variable that
+    // This declares a state variable (constant, global) that
     // stores a `Voter` struct for each possible address.
-    mapping(address => Voter) public voters;
+    mapping(address => Voter) public voters; // Hashmap
 
     // A dynamically-sized array of `Proposal` structs.
     Proposal[] public proposals;
@@ -50,16 +48,16 @@ contract Ballot {
     function giveRightToVote(address voter) {
         if (msg.sender != chairperson || voters[voter].voted) {
             // `throw` terminates and reverts all changes to
-            // the state and to Ether balances. It is often
-            // a good idea to use this if functions are
-            // called incorrectly. But watch out, this
+            // the state and to Ether balances.  But this
             // will also consume all provided gas.
             throw;
         }
         voters[voter].weight = 1;
     }
 
-    /// Delegate your vote to the voter `to`.
+    // Delegate your vote to the voter `to`.
+	 // Address of sender will be linked to the provided 'to'
+	 // in future votes. 
     function delegate(address to) {
         // assigns reference
         Voter sender = voters[msg.sender];
@@ -81,7 +79,9 @@ contract Ballot {
             to = voters[to].delegate;
         }
 
-        // We found a loop in the delegation, not allowed.
+		  // Ex: 'a' delegated to 'b', but then 'b' delegated to 'a'. 
+        // Results in loop within the delegation process, so revert
+		  // state and consume remaining gas.
         if (to == msg.sender) {
             throw;
         }
