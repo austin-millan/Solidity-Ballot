@@ -79,7 +79,8 @@ contract Ballot {
             to = voters[to].delegate;
         }
 
-		  // Ex: 'a' delegated to 'b', but then 'b' delegated to 'a'. 
+		  // Ex: 'a' delegated to 'b', but 'b'
+		  // delegates to 'a'. Es no bueno.
         // Results in loop within the delegation process, so revert
 		  // state and consume remaining gas.
         if (to == msg.sender) {
@@ -118,13 +119,12 @@ contract Ballot {
         proposals[proposal].voteCount += sender.weight;
     }
 
-    /// @dev Computes the winning proposal taking all
-    /// previous votes into account.
+    // Computes the winning proposal.
     function winningProposal() constant
             returns (uint winningProposal)
     {
         uint winningVoteCount = 0;
-        for (uint p = 0; p < proposals.length; p++) {
+        for (uint p = 0; p < proposals.length; ++p) {
             if (proposals[p].voteCount > winningVoteCount) {
                 winningVoteCount = proposals[p].voteCount;
                 winningProposal = p;
