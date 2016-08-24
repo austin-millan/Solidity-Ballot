@@ -56,8 +56,8 @@ contract Ballot {
     }
 
     // Delegate your vote to the voter `to`.
-	 // Address of sender will be linked to the provided 'to'
-	 // in future votes. 
+    // Address of sender will be linked to the provided 'to'
+    // in future votes. 
     function delegate(address to) {
         // assigns reference
         Voter sender = voters[msg.sender];
@@ -79,8 +79,8 @@ contract Ballot {
             to = voters[to].delegate;
         }
 
-		  // Ex: 'a' delegated to 'b', but 'b'
-		  // delegates to 'a'. Es no bueno.
+	// Ex: 'a' delegated to 'b', but 'b'
+	// delegates to 'a'. Es no bueno.
         // Results in loop within the delegation process, so revert
 		  // state and consume remaining gas.
         if (to == msg.sender) {
